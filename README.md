@@ -27,7 +27,6 @@
 - 🛡️ Serve HTTPS endpoints with **Falcon-based certificates**
 - 🧪 **Post-quantum mTLS** reverse proxy for microservices
 - ⚙️ Drop-in edge for PQC-enabled zero-trust networks
-- 📦 Hardened base for secure, containerized L7 gateways
 
 ---
 
