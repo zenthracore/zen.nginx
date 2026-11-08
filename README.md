@@ -14,7 +14,7 @@
 
 **zen.nginx** is a minimal Alpine Linux container featuring:
 
-- NGINX **1.29.x+**
+- NGINX **1.31.x+**
 - OpenSSL **3.3.4** (built July 2025)
 - Integrated [oqs-provider](https://github.com/open-quantum-safe/oqs-provider) for OpenSSL 3.x
 - Full support for **Falcon512 / Falcon1024** post-quantum TLS certificates

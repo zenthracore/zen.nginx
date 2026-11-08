@@ -1,4 +1,4 @@
-FROM alpine:3.20
+FROM alpine:3.24.4
 
 # --- Install base packages via apk ---
 RUN echo "--- Installing base packages via apk ---" \
@@ -27,13 +27,13 @@ RUN echo "--- Sanity check: test apk after base package install ---" \
 
 # --- Build liboqs ---
 RUN echo "--- Building liboqs ---" \
-    && git clone --branch 0.14.0 https://github.com/open-quantum-safe/liboqs.git \
+    && git clone --branch 0.16.0 https://github.com/open-quantum-safe/liboqs.git \
     && cd liboqs \
     && mkdir build && cd build \
     && cmake -DCMAKE_INSTALL_PREFIX=/usr/local \
-             -DBUILD_SHARED_LIBS=ON \
-             -DOQS_ENABLE_SIG_DILITHIUM=ON \
-             -DOQS_USE_AVX2=OFF .. \
+    -DBUILD_SHARED_LIBS=ON \
+    -DOQS_ENABLE_SIG_DILITHIUM=ON \
+    -DOQS_USE_AVX2=OFF .. \
     && make -j$(nproc) && make install \
     && echo "--- liboqs build complete ---" \
     && echo "--- Checking liboqs.so dependencies ---" \
@@ -50,10 +50,10 @@ RUN echo "--- Building oqs-provider ---" \
     && cd oqs-provider \
     && mkdir build && cd build \
     && cmake -DCMAKE_INSTALL_PREFIX=/usr/local \
-             -DCMAKE_PREFIX_PATH="/usr/local" \
-             -DOPENSSL_ROOT_DIR=/usr \
-             -DOPENSSL_LIBRARIES=/usr/lib \
-             -DOPENSSL_INCLUDE_DIR=/usr/include .. \
+    -DCMAKE_PREFIX_PATH="/usr/local" \
+    -DOPENSSL_ROOT_DIR=/usr \
+    -DOPENSSL_LIBRARIES=/usr/lib \
+    -DOPENSSL_INCLUDE_DIR=/usr/include .. \
     && make VERBOSE=1 -j$(nproc) | tee ../make_output.log \
     && make install \
     && echo "--- oqs-provider build complete ---" \
@@ -72,24 +72,24 @@ ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/lib:${LD_LIBRARY_PATH}
 
 ENV OPENSSL_CONF=/etc/ssl/openssl.cnf
 
-# --- Build OpenSSL 3.3.4 from source (без make install_sw!) ---
-ENV OPENSSL_VERSION=3.3.4
+# --- Build OpenSSL 4.1.0 from source (без make install_sw!) ---
+ENV OPENSSL_VERSION=4.1.0
 RUN wget https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}.tar.gz && \
     tar xzf openssl-${OPENSSL_VERSION}.tar.gz
 
-# --- Build nginx 1.29.0 with our OpenSSL ---
-ENV NGINX_VERSION=1.29.0
+# --- Build nginx 1.31.0 with our OpenSSL ---
+ENV NGINX_VERSION=1.31.0
 RUN wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && \
     tar xzf nginx-${NGINX_VERSION}.tar.gz && \
     cd nginx-${NGINX_VERSION} && \
     ./configure \
-      --prefix=/etc/nginx \
-      --sbin-path=/usr/sbin/nginx \
-      --modules-path=/usr/lib/nginx/modules \
-      --with-http_ssl_module \
-      --with-openssl=/openssl-${OPENSSL_VERSION} \
-      --with-cc-opt="-I/usr/local/include" \
-      --with-ld-opt="-L/usr/local/lib" \
+    --prefix=/etc/nginx \
+    --sbin-path=/usr/sbin/nginx \
+    --modules-path=/usr/lib/nginx/modules \
+    --with-http_ssl_module \
+    --with-openssl=/openssl-${OPENSSL_VERSION} \
+    --with-cc-opt="-I/usr/local/include" \
+    --with-ld-opt="-L/usr/local/lib" \
     && make -j$(nproc) && make install && cd .. && rm -rf nginx-${NGINX_VERSION}* openssl-${OPENSSL_VERSION}*
 
 # --- Patch openssl.cnf to activate oqsprovider and default providers ---
