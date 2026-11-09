@@ -1,6 +1,9 @@
 # ==============================================================================
 # ZENTHRACORE CONTINUITY - ALLOWED AGENT IPS
 # ==============================================================================
+# This map is a network perimeter only. It is NOT per-agent identity: agent
+# identity comes from the verified client certificate forwarded to
+# agent-control. Keep this list narrow as defense in depth.
 # Syntax: <IP or CIDR> 1;
 # Example:
 # 198.51.100.25 1;
@@ -8,3 +11,4 @@
 
 127.0.0.1 1;
 ::1 1;
+
